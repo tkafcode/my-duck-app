@@ -4,13 +4,13 @@
 import React, { useEffect, useState } from "react"
 import ArtistCarousel from "../artists/components/ArtistCarousel"
 import { useScrollFadeIn } from "../../hooks/useScrollFadeIn"
+import GetStarted from "./GetStarted"
 
 export default function ScrollSections() {
   const heroRef = useScrollFadeIn("up", 0.8, 0)
   const getStartedRef = useScrollFadeIn("up", 0.8, 0.4)
   const artistsRef = useScrollFadeIn("up", 0.8, 0.6)
 
-  // Scroll progress state
   const [scrollPct, setScrollPct] = useState(0)
   useEffect(() => {
     function updateProgress() {
@@ -30,7 +30,7 @@ export default function ScrollSections() {
         style={{ width: `${scrollPct}%` }}
       />
 
-      {/* ===== Hero Header (Glassmorphism) ===== */}
+      {/* ===== Hero Header ===== */}
       <section
         ref={heroRef}
         className="
@@ -56,61 +56,10 @@ export default function ScrollSections() {
         </p>
       </section>
 
-      {/* ===== Get Started (Gradient Overlay) ===== */}
-      <section
-        ref={getStartedRef}
-        className="
-          mb-12
-          relative
-          rounded-2xl
-          overflow-hidden
-          shadow-lg
-        "
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-cream-beige/60 to-forest-green/20"></div>
-        <div className="relative bg-white/80 p-6 backdrop-blur-md">
-          <h2 className="text-2xl font-serif font-semibold text-forest-green mb-4">
-            Get Started
-          </h2>
-          <p className="prose prose-neutral text-gray-700 mb-6">
-            Use the navigation above to explore our site. Learn about our one-man
-            craft on the About page or venture into “Cthulhu Therapy” for a cosmic
-            fabrication twist.
-          </p>
-          <div className="flex justify-center space-x-4 mb-8">
-            <a
-              href="/about"
-              className="
-                px-5 py-2
-                bg-wood-brown text-cream-beige
-                rounded-full
-                shadow-neu
-                hover:bg-forest-green
-                transform hover:scale-105
-                transition
-              "
-            >
-              About
-            </a>
-            <a
-              href="/cthulhu-therapy"
-              className="
-                px-5 py-2
-                bg-wood-brown text-cream-beige
-                rounded-full
-                shadow-neu
-                hover:bg-forest-green
-                transform hover:scale-105
-                transition
-              "
-            >
-              Cthulhu Therapy
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* ===== Get Started ===== */}
+      <GetStarted ref={getStartedRef} />
 
-      {/* ===== Featured Artists (Horizontal Scroll Snap) ===== */}
+      {/* ===== Featured Artists ===== */}
       <section
         ref={artistsRef}
         className="

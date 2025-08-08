@@ -1,4 +1,4 @@
-// src/app/components/Navbar.tsx
+// File: src/app/components/Navbar.tsx
 "use client"
 
 import { useState } from "react"
@@ -13,7 +13,10 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/cthulhu-therapy", label: "Therapy" },
-    { href: "/map", label: "Map" }
+    { href: "/planetary-hours", label: "Hours" },
+    { href: "/map", label: "Map" },
+    { href: "/artists", label: "Artists" },
+    { href: "/duck", label: "Ducks" }
   ]
 
   return (
@@ -24,62 +27,62 @@ export default function Navbar() {
             WildWood
           </Link>
 
+          {/* Desktop Links */}
           <div className="hidden md:flex space-x-8">
-            {links.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={
-                  "px-3 py-2 rounded-md font-serif font-medium transition-colors " +
-                  (pathname === href
-                    ? "text-forest-green"
-                    : "text-wood-brown hover:text-forest-green")
-                }
-              >
-                {label}
-              </Link>
-            ))}
+            {links.map(({ href, label }) => {
+              const active = pathname === href
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={
+                    "px-3 py-2 rounded-md font-serif font-medium transition-colors " +
+                    (active
+                      ? "text-forest-green underline"
+                      : "text-wood-brown hover:text-forest-green")
+                  }
+                >
+                  {label}
+                </Link>
+              )
+            })}
           </div>
 
+          {/* Mobile Toggle */}
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden p-2 rounded-md text-wood-brown hover:text-forest-green focus:outline-none"
+            aria-label="Toggle navigation"
           >
-            <span className="sr-only">Toggle navigation</span>
-            {open ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-              </svg>
-            )}
+            {open ? "✕" : "☰"}
           </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {open && (
         <div className="md:hidden bg-white bg-opacity-90 border-t border-gray-200">
           <div className="px-4 pt-2 pb-4 space-y-1">
-            {links.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className={
-                  "block px-3 py-2 rounded-md font-serif font-medium transition-colors " +
-                  (pathname === href
-                    ? "text-forest-green"
-                    : "text-wood-brown hover:text-forest-green")
-                }
-              >
-                {label}
-              </Link>
-            ))}
+            {links.map(({ href, label }) => {
+              const active = pathname === href
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className={
+                    "block px-3 py-2 rounded-md font-serif font-medium transition-colors " +
+                    (active
+                      ? "text-forest-green bg-gray-100"
+                      : "text-wood-brown hover:text-forest-green")
+                  }
+                >
+                  {label}
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
     </nav>
-  )
-}
+)
