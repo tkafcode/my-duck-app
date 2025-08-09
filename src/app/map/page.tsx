@@ -1,35 +1,18 @@
-// src/app/map/page.tsx
-"use client";
+// File: src/app/map/page.tsx
+"use client"
 
-import { useState } from "react";
-import GeocodeAddress from "./components/GeocodeAddress";
-import Map from "./components/Map";
-import WeatherCalendar from "./components/WeatherCalendar";
-
-type Location = {
-  lat: number;
-  lng: number;
-  display_name: string;
-};
+import GeocodeAddress from "./components/GeocodeAddress"
+import Map from "./components/Map"
+import WeatherCalendar from "./components/WeatherCalendar"
+import { useLocation } from "../../context/location-context"
 
 export default function MapPage() {
-  const [location, setLocation] = useState<Location | null>(null);
-
-  function handleSelect(raw: {
-    lat: string | number;
-    lon: string | number;
-    display_name: string;
-  }) {
-    const lat = typeof raw.lat === "string" ? parseFloat(raw.lat) : raw.lat;
-    const lng = typeof raw.lon === "string" ? parseFloat(raw.lon) : raw.lon;
-    setLocation({ lat, lng, display_name: raw.display_name });
-  }
+  const { location } = useLocation()
 
   return (
     <div className="min-h-screen p-4 space-y-6 bg-gray-50">
       <h1 className="text-3xl font-bold">Interactive Map & Weather</h1>
-
-      <GeocodeAddress onSelect={handleSelect} />
+      <GeocodeAddress />
 
       {location && (
         <div className="space-y-4">
@@ -39,12 +22,12 @@ export default function MapPage() {
           </p>
 
           <div className="h-64 w-full rounded-lg overflow-hidden shadow">
-            <Map location={location} />
+            <Map />
           </div>
 
-          <WeatherCalendar coords={location} />
+          <WeatherCalendar />
         </div>
       )}
     </div>
-  );
+  )
 }

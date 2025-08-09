@@ -1,105 +1,99 @@
-// src/app/map/components/GeocodeAddress.tsx
-"use client";
+// File: src/app/map/components/GeocodeAddress.tsx
+"use client"
 
-/**
- * File: src/app/map/components/GeocodeAddress.tsx
- */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
+import { useLocation } from "../../../context/location-context"
+import { useSun } from "../../../context/sun-context"
 
-interface RawLocation {
-  lat: string;
-  lon: string;
-  display_name: string;
-  place_id: number;
-}
-
-interface Props {
-  onSelect: (location: {
-    lat: number;
-    lon: number;
-    display_name: string;
-  }) => void;
-}
-
-export default function GeocodeAddress({ onSelect }: Props) {
-  const [inputValue, setInputValue] = useState("");
-  const [suggestions, setSuggestions] = useState<RawLocation[]>([]);
-  const [geoError, setGeoError] = useState<string | null>(null);
+export default function GeocodeAddress() {
+  const { setLocation } = useLocation()
+  const { setSunTimes } = useSun()              // ← import sun context setter
+  const [inputValue, setInputValue] = useState("")
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [geoError, setGeoError] = useState<string | null>(null)
   const [permissionState, setPermissionState] =
-    useState<PermissionState>("prompt");
+    useState<PermissionState>("prompt")
 
-  // Track permission state
   useEffect(() => {
     navigator.permissions
       ?.query({ name: "geolocation" })
-      .then((status) => {
-        setPermissionState(status.state);
-      })
-      .catch(() => {});
-  }, []);
+      .then((status) => setPermissionState(status.state))
+      .catch(() => {})
+  }, [])
 
-  // Initial geolocation attempt
   useEffect(() => {
     if (!navigator.geolocation) {
-      setGeoError("Geolocation not supported");
-      return;
+      setGeoError("Geolocation not supported")
+      return
     }
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) =>
-        reverseGeocode(coords.latitude, coords.longitude),
+      ({ coords }) => handleLocation(coords.latitude, coords.longitude),
       (err) => {
         if (err.code !== err.PERMISSION_DENIED) {
-          setGeoError(err.message || "Unable to retrieve location");
+          setGeoError(err.message || "Unable to retrieve location")
         }
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  }, []);
+    )
+  }, [])
 
-  async function reverseGeocode(lat: number, lon: number) {
+  async function handleLocation(lat: number, lon: number) {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-      );
-      const data = await res.json();
-      onSelect({
+      )
+      const data = await res.json()
+      const loc = {
         lat,
-        lon,
+        lng: lon,
         display_name: data.display_name || "Unnamed location",
-      });
+      }
+
+      setLocation(loc)
+
+      // Fetch and set sunrise/sunset immediately after storing location
+      fetch(
+        `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}&formatted=0`
+      )
+        .then((r) => r.json())
+        .then(({ results }) => {
+          setSunTimes({
+            sunrise: new Date(results.sunrise),
+            sunset: new Date(results.sunset),
+          })
+        })
+        .catch(() => {
+          /* silently ignore fetch errors */
+        })
     } catch {
-      setGeoError("Reverse geocode failed");
+      setGeoError("Reverse geocode failed")
     }
   }
 
   async function fetchSuggestions(q: string) {
-    if (!q) return setSuggestions([]);
+    if (!q) return setSuggestions([])
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           q
         )}`
-      );
-      setSuggestions(await res.json());
+      )
+      setSuggestions(await res.json())
     } catch {
-      setGeoError("Failed to fetch suggestions");
+      setGeoError("Failed to fetch suggestions")
     }
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    setInputValue(value);
-    fetchSuggestions(value);
+    const value = e.target.value
+    setInputValue(value)
+    fetchSuggestions(value)
   }
 
-  function pick(loc: RawLocation) {
-    setInputValue(loc.display_name);
-    setSuggestions([]);
-    onSelect({
-      lat: parseFloat(loc.lat),
-      lon: parseFloat(loc.lon),
-      display_name: loc.display_name,
-    });
+  function pick(loc: any) {
+    setInputValue(loc.display_name)
+    setSuggestions([])
+    handleLocation(parseFloat(loc.lat), parseFloat(loc.lon))
   }
 
   return (
@@ -114,7 +108,8 @@ export default function GeocodeAddress({ onSelect }: Props) {
 
       {permissionState === "denied" && !inputValue && (
         <p className="text-yellow-700">
-          You’ve blocked location access. Please enable it in your browser settings.
+          You’ve blocked location access. Please enable it in your browser
+          settings.
         </p>
       )}
 
@@ -136,5 +131,5 @@ export default function GeocodeAddress({ onSelect }: Props) {
         </ul>
       )}
     </div>
-  );
+  )
 }

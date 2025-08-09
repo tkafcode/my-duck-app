@@ -1,13 +1,14 @@
 // File: src/app/components/Navbar.tsx
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useScrolledPastFirstScreen } from "../../hooks/useScrolledPastFirstScreen"
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const visible = useScrolledPastFirstScreen()
 
   const links = [
     { href: "/", label: "Home" },
@@ -20,7 +21,13 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 w-full z-10 bg-white bg-opacity-80 backdrop-blur-sm shadow-md">
+    <nav
+      className={`
+        fixed top-0 w-full z-10 bg-white/80 backdrop-blur-sm shadow-md
+        transition-opacity duration-500 ease-out
+        ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}
+      `}
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-serif font-bold text-wood-brown">
